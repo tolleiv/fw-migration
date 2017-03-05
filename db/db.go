@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
+	"github.com/tolleiv/fw-migration/config"
 )
 
 var (
@@ -12,7 +13,7 @@ var (
 
 func init() {
 	var err error
-	DB, err = gorm.Open("sqlite3", "demo.db")
+	DB, err = gorm.Open("sqlite3", config.Config.DB.Name)
 	if err == nil {
 		if os.Getenv("DEBUG") != "" {
 			DB.LogMode(true)
