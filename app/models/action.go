@@ -10,4 +10,5 @@ type Action struct {
 	Destination   ResourceGroup
 	ApplicationID uint
 	Application   Application
+	Action        string
 }

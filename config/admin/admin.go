@@ -12,6 +12,8 @@ var Admin *admin.Admin
 func init() {
 	Admin = admin.New(&qor.Config{DB: db.DB})
 
+	securityzone := Admin.AddResource(&models.SecurityZone{}, &admin.Config{Menu: []string{"Inputs"}, Priority: 99})
+
 	port := Admin.AddResource(&models.Port{}, &admin.Config{Menu: []string{"Inputs"}, Priority: 4})
 	port.SearchAttrs("Name", "Num")
 	port.EditAttrs(
@@ -24,7 +26,7 @@ func init() {
 	)
 
 	application := Admin.AddResource(&models.Application{}, &admin.Config{Menu: []string{"Inputs"}, Priority: 2})
-	application.SearchAttrs("Name", "Source", "Destination", "Proto")
+	application.SearchAttrs("Name", "Source.Name", "Destination.Name", "Proto")
 	application.EditAttrs(
 		&admin.Section{
 			Title: "Details",
@@ -48,20 +50,25 @@ func init() {
 
 	resourcegroup := Admin.AddResource(&models.ResourceGroup{}, &admin.Config{Menu: []string{"Inputs"}, Priority: 3})
 	resourcegroup.SearchAttrs("Name")
+	resourcegroup.Filter(&admin.Filter{
+		Name:   "SecurityZone",
+		Config: &admin.SelectOneConfig{RemoteDataResource: securityzone},
+	})
+
 	Admin.AddResource(&models.Resource{}, &admin.Config{Menu: []string{"Inputs"}})
 
 	action := Admin.AddResource(&models.Action{}, &admin.Config{Menu: []string{"Inputs"}, Priority: 1})
-	action.SearchAttrs("Application", "Source", "Destination")
+	action.SearchAttrs("Application", "Source.Name", "Destination.Name")
 	action.Meta(&admin.Meta{Name: "Application", Config: &admin.SelectOneConfig{AllowBlank: true}})
 	action.Meta(&admin.Meta{Name: "Source", Config: &admin.SelectOneConfig{AllowBlank: true}})
 	action.Meta(&admin.Meta{Name: "Destination", Config: &admin.SelectOneConfig{AllowBlank: true}})
-
+	action.Meta(&admin.Meta{Name: "Action", Config: &admin.SelectOneConfig{Collection: []string{"ACCEPT", "DENY", "REJECT"}}})
 	action.EditAttrs(
 		&admin.Section{
 			Title: "Details",
 			Rows: [][]string{
 				{"Application"},
-				{"Source", "Destination"},
+				{"Source", "Action", "Destination"},
 			}},
 	)
 	action.Filter(&admin.Filter{
@@ -86,6 +93,4 @@ func init() {
 			}},
 	)
 	proto.SearchAttrs("Name")
-
-	Admin.AddResource(&models.SecurityZone{}, &admin.Config{Menu: []string{"Inputs"}})
 }
