@@ -24,6 +24,7 @@ func init() {
 				{"Num"},
 			}},
 	)
+	port.NewAttrs(port.EditAttrs())
 
 	application := Admin.AddResource(&models.Application{}, &admin.Config{Menu: []string{"Inputs"}, Priority: 2})
 	application.SearchAttrs("Name", "Source.Name", "Destination.Name", "Proto")
@@ -71,6 +72,7 @@ func init() {
 				{"Source", "Action", "Destination"},
 			}},
 	)
+	action.NewAttrs(action.EditAttrs())
 	action.Filter(&admin.Filter{
 		Name:   "Application",
 		Config: &admin.SelectOneConfig{RemoteDataResource: application},
@@ -92,5 +94,8 @@ func init() {
 				{"Name"},
 			}},
 	)
+	proto.NewAttrs(proto.EditAttrs())
 	proto.SearchAttrs("Name")
+
+	Admin.AddSearchResource(action, application, resourcegroup)
 }
